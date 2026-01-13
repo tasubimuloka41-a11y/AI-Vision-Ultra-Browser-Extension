@@ -52,6 +52,28 @@
             </div>
         </section>
 
+        <section class="glass" style="padding: 16px;">
+            <h2>File Converter</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="file" id="converter-input" accept="image/png,image/jpeg,image/webp" style="display: none;">
+                <button class="btn-func glass btn-secondary" onclick="document.getElementById('converter-input').click()">
+                    <span>📁</span> Select Image
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <select id="target-format" class="chat-input" style="flex: 1; border-radius: 8px;">
+                        <option value="png">PNG</option>
+                        <option value="jpeg">JPG</option>
+                        <option value="webp">WebP</option>
+                    </select>
+                    <button class="btn-func glass btn-primary" id="btn-convert" style="padding: 8px 16px;">Convert</button>
+                </div>
+                <div id="convert-preview" style="display: none; margin-top: 10px; text-align: center;">
+                    <img id="converted-img" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--glass-border);">
+                    <a id="download-link" class="btn-func glass btn-secondary" style="margin-top: 8px; text-decoration: none; display: inline-flex;">Download</a>
+                </div>
+            </div>
+        </section>
+
         <div class="resize-handle" id="chat-resize-handle"></div>
         <div class="chat-container glass" id="chat-container">
             <div class="chat-messages" id="chat-messages">

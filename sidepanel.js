@@ -40,6 +40,42 @@
     document.body.style.cursor = 'default';
   });
 
+  // File Converter Integration
+  const converterInput = $("converter-input");
+  const btnConvert = $("btn-convert");
+  const targetFormat = $("target-format");
+  const convertPreview = $("convert-preview");
+  const convertedImg = $("converted-img");
+  const downloadLink = $("download-link");
+
+  if (btnConvert) {
+    btnConvert.addEventListener("click", async () => {
+      const file = converterInput.files[0];
+      if (!file) {
+        addMsg("system", "Please select a file first");
+        return;
+      }
+
+      setBusy(true);
+      try {
+        const { fileConverter } = await import('./file-converter.js');
+        const format = targetFormat.value;
+        const resultDataUrl = await fileConverter.convertImage(file, format);
+        
+        convertedImg.src = resultDataUrl;
+        downloadLink.href = resultDataUrl;
+        downloadLink.download = `converted-image.${format}`;
+        convertPreview.style.display = "block";
+        
+        addMsg("system", `Converted to ${format.toUpperCase()}`);
+      } catch (e) {
+        addMsg("system", "Conversion error: " + e.message);
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+
   var loading = $("loading");
   var viewerWrap = $("viewerWrap");
   var pageIframe = $("page-iframe");
