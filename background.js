@@ -90,6 +90,13 @@ async function searchWithGrok(query) {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request && request.action === "openCopilot") {
+    chrome.tabs.create({ url: request.url, active: false }, (tab) => {
+      sendResponse({ success: true, tabId: tab.id });
+    });
+    return true;
+  }
+
   if (request && request.action === "executeCommand") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs ? tabs[0] : null;

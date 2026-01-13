@@ -310,6 +310,44 @@
     }
   }
 
+  // M365 Copilot Integration
+  const btnConnectCopilot = $("btn-connect-copilot");
+  const btnSendCopilot = $("btn-send-copilot");
+  const copilotStatus = $("copilot-status");
+
+  if (btnConnectCopilot) {
+    btnConnectCopilot.addEventListener("click", async () => {
+      setBusy(true);
+      try {
+        const { m365Copilot } = await import('./m365-copilot.js');
+        await m365Copilot.openCopilotSession();
+        if (copilotStatus) {
+          copilotStatus.classList.add("online");
+          copilotStatus.title = "Copilot Connected";
+        }
+        addMsg("system", "M365 Copilot session opened");
+      } catch (e) {
+        addMsg("system", "Copilot connection error: " + e.message);
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+
+  if (btnSendCopilot) {
+    btnSendCopilot.addEventListener("click", async () => {
+      const text = prompt.value;
+      if (!text) return;
+      try {
+        const { m365Copilot } = await import('./m365-copilot.js');
+        await m365Copilot.sendMessage(text);
+        addMsg("system", "Sent to Copilot");
+      } catch (e) {
+        addMsg("system", "Error sending to Copilot: " + e.message);
+      }
+    });
+  }
+
   loadMemory();
 
   if (chatLog) {
