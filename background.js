@@ -89,7 +89,64 @@ async function searchWithGrok(query) {
   }
 }
 
+async function cloudChat(modelId, messages) {
+  try {
+    if (modelId === "gemini-2.0-flash-exp") {
+      // Placeholder for Gemini API call
+      // In a real extension, you'd use chrome.storage to get the API key
+      const apiKey = "YOUR_GEMINI_API_KEY"; 
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
+      
+      const contents = messages.map(m => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }]
+      }));
+
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents })
+      });
+      const data = await resp.json();
+      return data.candidates[0].content.parts[0].text;
+    } 
+    
+    if (modelId === "deepseek-coder") {
+      const apiKey = "YOUR_DEEPSEEK_API_KEY";
+      const url = "https://api.deepseek.com/chat/completions";
+      
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "deepseek-coder",
+          messages: messages,
+          stream: false
+        })
+      });
+      const data = await resp.json();
+      return data.choices[0].message.content;
+    }
+    
+    throw new Error("Unknown cloud model");
+  } catch (e) {
+    throw e;
+  }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request && request.action === "cloudChat") {
+    cloudChat(request.modelId, request.messages).then(data => {
+      sendResponse({ success: true, data: data });
+    }).catch(e => {
+      sendResponse({ success: false, error: e.message });
+    });
+    return true;
+  }
+
   if (request && request.action === "executeCommand") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs ? tabs[0] : null;
