@@ -36,12 +36,6 @@
   var OLLAMA = "";
   var PORTS = [11434, 11435, 8080, 5050];
   var VISION_KEYWORDS = ["vision","llava","moondream","qwen","minicpm","gemma","vl","mm"];
-  
-  var CLOUD_MODELS = [
-    { id: "gemini-2.0-flash-exp", name: "Gemini 2.0 Flash (Cloud)", type: "vision" },
-    { id: "deepseek-coder", name: "DeepSeek Coder (Cloud)", type: "text" }
-  ];
-  
   var abortController = null;
   var currentImageBase64 = null;
   var visorActive = false;
@@ -192,15 +186,6 @@
         visionSel.innerHTML = vision.length ? "" : '<option value="">No vision</option>';
         textSel.innerHTML = text.length ? "" : '<option value="">No text</option>';
         
-        // Add Cloud Models
-        CLOUD_MODELS.forEach(function(m) {
-          var o = document.createElement("option");
-          o.value = "cloud:" + m.id;
-          o.textContent = "☁️ " + m.name;
-          if (m.type === "vision") visionSel.appendChild(o);
-          else textSel.appendChild(o);
-        });
-
         vision.forEach(function(m) {
           var o = document.createElement("option");
           o.value = m;
@@ -457,10 +442,6 @@
   }
   
   function ollamaChat(model, messages, signal) {
-    if (model.startsWith("cloud:")) {
-      var cloudId = model.replace("cloud:", "");
-      return cloudChat(cloudId, messages, signal);
-    }
     return fetch(OLLAMA + "/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -479,21 +460,6 @@
       return res.json();
     }).then(function(data) {
       return data.message ? String(data.message.content || "") : "";
-    });
-  }
-
-  function cloudChat(modelId, messages, signal) {
-    // Proxied through background for API key safety and CORS
-    return new Promise(function(resolve, reject) {
-      chrome.runtime.sendMessage({
-        action: "cloudChat",
-        modelId: modelId,
-        messages: messages
-      }, function(resp) {
-        if (chrome.runtime.lastError) return reject(new Error(chrome.runtime.lastError.message));
-        if (resp && resp.success) resolve(resp.data);
-        else reject(new Error(resp ? resp.error : "Cloud API error"));
-      });
     });
   }
   
