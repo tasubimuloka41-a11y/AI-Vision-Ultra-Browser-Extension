@@ -26,65 +26,17 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  width: 100%; /* Ensure body takes full width */
 }
 
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Responsive grid for models and functions */
+.model-grid, .function-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
 }
 
-/* Glassmorphism utility */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-}
-
-/* Header */
-header {
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.logo {
-  font-size: 1.2rem;
-  font-weight: bold;
-  background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.status-pills {
-  display: flex;
-  gap: 8px;
-}
-
-.status-pill {
-  font-size: 0.7rem;
-  padding: 4px 8px;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.status-pill.online::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  background: #00ff88;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #00ff88;
-}
-
-/* Sections */
+/* Adjust main content to handle overflow properly */
 main {
   flex: 1;
   overflow-y: auto;
@@ -94,55 +46,22 @@ main {
   gap: 20px;
   scrollbar-width: thin;
   scrollbar-color: var(--glass-border) transparent;
+  width: 100%;
 }
 
-section h2 {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-dim);
-  margin-bottom: 12px;
+/* Ensure chat container and other elements are responsive */
+.chat-container, .glass, header, section {
+  width: 100%;
 }
 
-/* Model Selector */
-.model-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.model-card {
-  padding: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-}
-
-.model-card:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.model-card.active {
-  border-color: var(--accent-cyan);
-  background: rgba(0, 210, 255, 0.1);
-  box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
-}
-
-.model-icon {
-  font-size: 1.5rem;
-}
-
-/* Function Buttons */
-.function-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+/* Mobile/Narrow view adjustments */
+@media (max-width: 300px) {
+  .model-grid, .function-grid {
+    grid-template-columns: 1fr;
+  }
+  .logo {
+    font-size: 1rem;
+  }
 }
 
 .btn-func {
