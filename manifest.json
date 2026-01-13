@@ -1,0 +1,13 @@
+﻿{
+  "manifest_version": 3,
+  "name": "AI Vision Ultra - Google Fixed",
+  "version": "25.0.0",
+  "description": "Google + все сайты в iframe + DDG + Grok + Agent",
+  "permissions": ["sidePanel","storage","unlimitedStorage","tabs","activeTab","scripting","downloads","declarativeNetRequest","tabCapture"],
+  "host_permissions": ["<all_urls>"],
+  "action": { "default_title": "AI Vision Ultra" },
+  "side_panel": { "default_path": "sidepanel.html" },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "content_scripts": [{"matches": ["<all_urls>"],"js": ["content.js"],"run_at": "document_idle"}],
+  "declarative_net_request": {"rule_resources": [{"id": "ruleset_1","enabled": true,"path": "rules.json"}]}
+}
