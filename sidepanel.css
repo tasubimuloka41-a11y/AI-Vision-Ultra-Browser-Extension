@@ -167,11 +167,36 @@ section h2 {
 .btn-secondary { background: linear-gradient(45deg, #11998e, #38ef7d); }
 
 /* Chat Window */
+/* Resizable handle */
+.resize-handle {
+  height: 8px;
+  background: var(--glass-border);
+  cursor: ns-resize;
+  width: 100%;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resize-handle:hover {
+  background: var(--accent-cyan);
+}
+
+.resize-handle::after {
+  content: '';
+  width: 30px;
+  height: 2px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+}
+
 .chat-container {
-  height: 200px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   margin-top: auto;
+  transition: height 0.1s ease-out; /* Smooth but responsive */
 }
 
 .chat-messages {

@@ -3,7 +3,43 @@
   
   function $(id) { return document.getElementById(id); }
   
-  var chatLog = $("chat-log");
+  var chatLog = $("chat-messages");
+  var chatContainer = $("chat-container");
+  var resizeHandle = $("chat-resize-handle");
+
+  // Load saved height
+  var savedHeight = localStorage.getItem('chatContainerHeight');
+  if (savedHeight) {
+    chatContainer.style.height = savedHeight + 'px';
+  }
+
+  // Resizing logic
+  let isResizing = false;
+
+  resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'ns-resize';
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    
+    // Calculate new height (from bottom of screen)
+    const newHeight = window.innerHeight - e.clientY;
+    
+    // Constraints
+    if (newHeight > 150 && newHeight < window.innerHeight * 0.8) {
+      chatContainer.style.height = newHeight + 'px';
+      localStorage.setItem('chatContainerHeight', newHeight);
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    isResizing = false;
+    document.body.style.cursor = 'default';
+  });
+
   var loading = $("loading");
   var viewerWrap = $("viewerWrap");
   var pageIframe = $("page-iframe");
@@ -128,16 +164,18 @@
       img.style.marginTop = "8px";
       box.appendChild(img);
     }
-    chatLog.appendChild(box);
-    chatLog.scrollTop = chatLog.scrollHeight;
+    if (chatLog) chatLog.appendChild(box);
+    if (chatLog) chatLog.scrollTop = chatLog.scrollHeight;
   }
   
-  chatLog.addEventListener("click", function(e) {
-    if (e.target.tagName === "A" && e.target.dataset.url) {
-      e.preventDefault();
-      openPageInPanel(e.target.dataset.url);
-    }
-  });
+  if (chatLog) {
+    chatLog.addEventListener("click", function(e) {
+      if (e.target.tagName === "A" && e.target.dataset.url) {
+        e.preventDefault();
+        openPageInPanel(e.target.dataset.url);
+      }
+    });
+  }
   
   closePageBtn.addEventListener("click", function() {
     pageIframe.src = "";
