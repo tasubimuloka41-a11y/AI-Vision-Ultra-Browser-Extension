@@ -10,9 +10,11 @@ export const m365Copilot = {
   },
 
   async sendMessage(text) {
-    // Communication logic with the Copilot tab
-    console.log("Sending to Copilot:", text);
-    // Placeholder for content script messaging
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage({ action: "sendMessageToCopilot", text }, (response) => {
+        resolve(response);
+      });
+    });
   },
 
   async getCopilotResponse() {

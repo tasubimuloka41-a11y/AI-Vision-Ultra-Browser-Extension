@@ -89,12 +89,23 @@ async function searchWithGrok(query) {
   }
 }
 
+let copilotTabId = null;
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request && request.action === "openCopilot") {
     chrome.tabs.create({ url: request.url, active: false }, (tab) => {
+      copilotTabId = tab.id;
       sendResponse({ success: true, tabId: tab.id });
     });
     return true;
+  }
+
+  if (request && request.action === "sendMessageToCopilot") {
+    if (copilotTabId) {
+      chrome.tabs.sendMessage(copilotTabId, { action: "sendToCopilot", text: request.text }, sendResponse);
+      return true;
+    }
+    sendResponse({ success: false, error: "Copilot tab not found" });
   }
 
   if (request && request.action === "executeCommand") {

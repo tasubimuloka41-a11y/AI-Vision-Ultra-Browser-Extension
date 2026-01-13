@@ -15,6 +15,9 @@
   "action": { "default_title": "AI Vision Ultra" },
   "side_panel": { "default_path": "sidepanel.html" },
   "background": { "service_worker": "background.js", "type": "module" },
-  "content_scripts": [{"matches": ["<all_urls>"],"js": ["content.js"],"run_at": "document_idle"}],
+  "content_scripts": [
+    {"matches": ["<all_urls>"],"js": ["content.js"],"run_at": "document_idle"},
+    {"matches": ["https://m365.cloud.microsoft/*"],"js": ["m365-content.js"]}
+  ],
   "declarative_net_request": {"rule_resources": [{"id": "ruleset_1","enabled": true,"path": "rules.json"}]}
 }
