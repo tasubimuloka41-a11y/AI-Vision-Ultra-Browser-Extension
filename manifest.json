@@ -3,7 +3,14 @@
   "name": "AI Vision Ultra - Google Fixed",
   "version": "25.0.0",
   "description": "Google + все сайты в iframe + DDG + Grok + Agent",
-  "permissions": ["sidePanel","storage","unlimitedStorage","tabs","activeTab","scripting","downloads","declarativeNetRequest","tabCapture"],
+  "permissions": ["sidePanel","storage","unlimitedStorage","tabs","activeTab","scripting","downloads","declarativeNetRequest","tabCapture","identity"],
+  "oauth2": {
+    "client_id": "922619835629-r2joqeprlisj4p0qv66qcu6to1ji4lu.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/drive.appdata"
+    ]
+  },
   "host_permissions": ["<all_urls>"],
   "action": { "default_title": "AI Vision Ultra" },
   "side_panel": { "default_path": "sidepanel.html" },
