@@ -141,21 +141,47 @@
     });
   }
   
+  function renderAIResponse(text) {
+    // 1. Convert Markdown to HTML
+    let html = typeof marked !== 'undefined' ? marked.parse(text) : text;
+    
+    // 2. Sanitize HTML
+    if (typeof DOMPurify !== 'undefined') {
+      html = DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: [
+          'p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+          'ul', 'ol', 'li', 'code', 'pre', 'blockquote', 'table', 'thead', 
+          'tbody', 'tr', 'th', 'td', 'img', 'svg', 'path', 'circle', 'rect', 
+          'line', 'polyline', 'polygon', 'ellipse', 'canvas', 'button', 
+          'span', 'div', 'details', 'summary'
+        ],
+        ALLOWED_ATTR: ['src', 'alt', 'width', 'height', 'style', 'class', 'd', 'fill', 'stroke', 'viewBox', 'cx', 'cy', 'r', 'x', 'y', 'points', 'id']
+      });
+    }
+    return html;
+  }
+
   function addMsg(role, text, imageData) {
     var box = document.createElement("div");
-    box.className = "msg";
+    box.className = "msg " + (role === "assistant" ? "ai" : "user");
+    
     var r = document.createElement("div");
     r.className = "role";
-    r.textContent = role;
+    r.textContent = role === "assistant" ? "AI" : "You";
+    
     var t = document.createElement("div");
     t.className = "text";
+    
     if (role === "assistant") {
-      t.innerHTML = makeLinksClickable(text);
+      t.innerHTML = renderAIResponse(text);
+      // Re-apply link clickable logic if needed or let marked handle it
     } else {
       t.textContent = text;
     }
+    
     box.appendChild(r);
     box.appendChild(t);
+    
     if (imageData) {
       var img = document.createElement("img");
       img.src = "data:image/png;base64," + imageData;
@@ -164,6 +190,7 @@
       img.style.marginTop = "8px";
       box.appendChild(img);
     }
+    
     if (chatLog) chatLog.appendChild(box);
     if (chatLog) chatLog.scrollTop = chatLog.scrollHeight;
   }
