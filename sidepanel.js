@@ -197,7 +197,78 @@
     return html;
   }
 
-  function addMsg(role, text, imageData) {
+  // Chat Memory Integration
+  let currentConversationId = localStorage.getItem("currentConversationId") || crypto.randomUUID();
+  let currentMessages = [];
+
+  async function loadMemory() {
+    const { chatMemory } = await import('./chat-memory.js');
+    const history = await chatMemory.loadChatHistory(currentConversationId);
+    if (history) {
+      currentMessages = history.messages;
+      if (chatLog) chatLog.innerHTML = "";
+      currentMessages.forEach(msg => {
+        addMsg(msg.role, msg.content, null, false); // false to avoid re-saving
+      });
+    }
+    updateConversationList();
+  }
+
+  async function updateConversationList() {
+    const { chatMemory } = await import('./chat-memory.js');
+    const conversations = await chatMemory.listAllConversations();
+    const list = $("conversation-list");
+    if (!list) return;
+    list.innerHTML = "";
+    conversations.forEach(c => {
+      const item = document.createElement("div");
+      item.className = "status-pill " + (c.id === currentConversationId ? "online" : "");
+      item.style.cursor = "pointer";
+      item.style.justifyContent = "space-between";
+      item.innerHTML = `<span>${c.title}</span><span class="delete-chat" data-id="${c.id}" style="margin-left: 8px; cursor: pointer; opacity: 0.7;">✖</span>`;
+      item.onclick = (e) => {
+        if (e.target.classList.contains("delete-chat")) return;
+        currentConversationId = c.id;
+        localStorage.setItem("currentConversationId", c.id);
+        loadMemory();
+      };
+      const del = item.querySelector(".delete-chat");
+      del.onclick = async (e) => {
+        e.stopPropagation();
+        await chatMemory.deleteConversation(c.id);
+        if (c.id === currentConversationId) {
+          currentConversationId = crypto.randomUUID();
+          localStorage.setItem("currentConversationId", currentConversationId);
+          currentMessages = [];
+          if (chatLog) chatLog.innerHTML = "";
+        }
+        updateConversationList();
+      };
+      list.appendChild(item);
+    });
+  }
+
+  $("btn-new-chat")?.addEventListener("click", () => {
+    currentConversationId = crypto.randomUUID();
+    localStorage.setItem("currentConversationId", currentConversationId);
+    currentMessages = [];
+    if (chatLog) chatLog.innerHTML = "";
+    addMsg("assistant", "Hello! Starting a new conversation.");
+    updateConversationList();
+  });
+
+  $("btn-export-memory")?.addEventListener("click", async () => {
+    const { chatMemory } = await import('./chat-memory.js');
+    const conversations = await chatMemory.listAllConversations();
+    const url = chatMemory.exportToJSON(conversations);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ai-vision-training-data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  function addMsg(role, text, imageData, shouldSave = true) {
     var box = document.createElement("div");
     box.className = "msg " + (role === "assistant" ? "ai" : "user");
     
@@ -210,7 +281,6 @@
     
     if (role === "assistant") {
       t.innerHTML = renderAIResponse(text);
-      // Re-apply link clickable logic if needed or let marked handle it
     } else {
       t.textContent = text;
     }
@@ -229,8 +299,19 @@
     
     if (chatLog) chatLog.appendChild(box);
     if (chatLog) chatLog.scrollTop = chatLog.scrollHeight;
+
+    if (shouldSave) {
+      currentMessages.push({ role, content: text, timestamp: Date.now() });
+      import('./chat-memory.js').then(m => {
+        const title = currentMessages[0]?.content.slice(0, 20) || "Conversation";
+        m.chatMemory.saveChatHistory(currentConversationId, currentMessages, title);
+        updateConversationList();
+      });
+    }
   }
-  
+
+  loadMemory();
+
   if (chatLog) {
     chatLog.addEventListener("click", function(e) {
       if (e.target.tagName === "A" && e.target.dataset.url) {

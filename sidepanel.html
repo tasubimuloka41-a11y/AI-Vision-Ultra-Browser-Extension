@@ -53,6 +53,19 @@
         </section>
 
         <section class="glass" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2>History</h2>
+                <button class="btn-func glass btn-primary" id="btn-new-chat" style="padding: 4px 12px; font-size: 0.75rem;">+ New</button>
+            </div>
+            <div id="conversation-list" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Conversations will be listed here -->
+            </div>
+            <button class="btn-func glass btn-secondary" id="btn-export-memory" style="margin-top: 12px; width: 100%;">
+                <span>📥</span> Export for Training
+            </button>
+        </section>
+
+        <section class="glass" style="padding: 16px;">
             <h2>File Converter</h2>
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <input type="file" id="converter-input" accept="image/png,image/jpeg,image/webp" style="display: none;">
