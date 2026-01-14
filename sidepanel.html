@@ -1,124 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Vision Ultra</title>
-    <link rel="stylesheet" href="sidepanel.css">
+  <meta charset="utf-8" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{height:100vh;display:flex;flex-direction:column;background:#0e1621;color:#e5e7eb;font-family:Arial,system-ui}
+    #topbar{display:flex;gap:8px;padding:8px;border-bottom:1px solid #263241;background:#17212b;align-items:center;flex-wrap:wrap}
+    .btn{border:0;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;background:#2d3748;color:#cbd5e1}
+    .btn:hover{background:#3a4a63}
+    .btnPrimary{background:#6a1b9a;color:#fff}
+    .btnGreen{background:#4CAF50;color:#fff}
+    .btnRed{background:#dc3545;color:#fff}
+    .btnBlue{background:#2b5278;color:#fff}
+    .select{background:#2d3748;color:#fff;border:1px solid #4a5568;border-radius:8px;padding:7px;font-size:12px;min-width:150px}
+    #viewerWrap{display:none;flex:0 0 40%;border-bottom:1px solid #263241;position:relative;background:#0b1220}
+    #viewerWrap.active{display:block}
+    #page-iframe{width:100%;height:100%;border:0;background:#fff}
+    #viewerBtns{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:5}
+    #visorWrap{display:none;flex:0 0 30%;border-bottom:1px solid #263241;position:relative;background:#000}
+    #visorWrap.active{display:block}
+    #visor-canvas{width:100%;height:100%;object-fit:contain;background:#000}
+    #visorHint{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.8);padding:6px 10px;border-radius:8px;font-size:12px;color:#9ae6b4}
+    #visorBtns{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:5}
+    #rec-timer{display:none;position:absolute;bottom:8px;left:8px;background:rgba(220,53,69,.9);padding:6px 12px;border-radius:8px;font-size:14px;color:#fff;font-weight:bold}
+    #main{flex:1;display:flex;flex-direction:column;min-height:0}
+    #chat-log{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px;background:#0a0f16}
+    .msg{background:#111827;border-radius:10px;padding:8px}
+    .role{font-size:12px;color:#9ca3af;margin-bottom:6px;font-weight:bold}
+    .text{font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+    .text a{color:#60a5fa;text-decoration:underline;cursor:pointer}
+    #bottom{border-top:1px solid #263241;background:#17212b;padding:8px;display:flex;flex-direction:column;gap:8px}
+    #preview{display:none;gap:8px;align-items:center}
+    #preview img{max-height:200px;max-width:100%;border-radius:10px;border:2px solid #6a1b9a;object-fit:contain;background:#000}
+    #inputShell{display:flex;gap:8px;align-items:flex-end;background:#0f1722;border:1px solid #263241;border-radius:12px;padding:8px}
+    #prompt{flex:1;min-height:56px;max-height:160px;resize:vertical;border:0;border-radius:10px;background:#1f2933;color:#fff;padding:10px;font-size:13px}
+    #loading{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:9999}
+    .spinner{width:36px;height:36px;border:4px solid #2b5278;border-top-color:#8ab4f8;border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
 </head>
 <body>
-    <header class="glass">
-        <div class="logo">AI VISION ULTRA</div>
-        <div class="status-pills">
-            <div class="status-pill online" title="Drive Connected">Drive</div>
-            <div class="status-pill" title="Colab Disconnected">Colab</div>
-            <div class="status-pill" id="copilot-status" title="Copilot Disconnected">Copilot</div>
-        </div>
-    </header>
-
-    <main>
-        <section>
-            <h2>Integrations</h2>
-            <div class="function-grid">
-                <button class="btn-func glass btn-primary" id="btn-connect-copilot">
-                    <span>Ⓜ️</span> Connect Copilot
-                </button>
-                <button class="btn-func glass btn-secondary" id="btn-send-copilot">
-                    <span>🚀</span> Send to Copilot
-                </button>
-            </div>
-        </section>
-        <section>
-            <h2>AI Models</h2>
-            <div class="model-grid">
-                <div class="model-card glass active" id="model-gemini">
-                    <span class="model-icon">👁️</span>
-                    <span>Gemini Vision</span>
-                </div>
-                <div class="model-card glass" id="model-deepseek">
-                    <span class="model-icon">💻</span>
-                    <span>DeepSeek Coder</span>
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <h2>Functions</h2>
-            <div class="function-grid">
-                <button class="btn-func glass btn-primary" id="btn-screenshot">
-                    <span>📸</span> Screenshot
-                </button>
-                <button class="btn-func glass btn-primary" id="btn-vision">
-                    <span>⚡</span> AI Vision
-                </button>
-                <button class="btn-func glass btn-secondary" id="btn-search">
-                    <span>🌐</span> Web Search
-                </button>
-                <div class="btn-func glass" style="justify-content: space-between; padding: 0 12px;">
-                    <span style="font-size: 0.8rem;">🤖 Autonomous</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-autonomous">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </section>
-
-        <section class="glass" style="padding: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h2>History</h2>
-                <button class="btn-func glass btn-primary" id="btn-new-chat" style="padding: 4px 12px; font-size: 0.75rem;">+ New</button>
-            </div>
-            <div id="conversation-list" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
-                <!-- Conversations will be listed here -->
-            </div>
-            <button class="btn-func glass btn-secondary" id="btn-export-memory" style="margin-top: 12px; width: 100%;">
-                <span>📥</span> Export for Training
-            </button>
-        </section>
-
-        <section class="glass" style="padding: 16px;">
-            <h2>File Converter</h2>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="file" id="converter-input" accept="image/png,image/jpeg,image/webp" style="display: none;">
-                <button class="btn-func glass btn-secondary" onclick="document.getElementById('converter-input').click()">
-                    <span>📁</span> Select Image
-                </button>
-                <div style="display: flex; gap: 8px;">
-                    <select id="target-format" class="chat-input" style="flex: 1; border-radius: 8px;">
-                        <option value="png">PNG</option>
-                        <option value="jpeg">JPG</option>
-                        <option value="webp">WebP</option>
-                    </select>
-                    <button class="btn-func glass btn-primary" id="btn-convert" style="padding: 8px 16px;">Convert</button>
-                </div>
-                <div id="convert-preview" style="display: none; margin-top: 10px; text-align: center;">
-                    <img id="converted-img" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--glass-border);">
-                    <a id="download-link" class="btn-func glass btn-secondary" style="margin-top: 8px; text-decoration: none; display: inline-flex;">Download</a>
-                </div>
-            </div>
-        </section>
-
-        <div class="resize-handle" id="chat-resize-handle"></div>
-        <div class="chat-container glass" id="chat-container">
-            <div class="chat-messages" id="chat-messages">
-                <div class="message ai">Hello! How can I help you with AI Vision today?</div>
-            </div>
-            <div class="typing-indicator" id="typing-indicator" style="display: none;">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" class="chat-input" placeholder="Ask AI anything..." id="chat-input">
-                <button class="btn-func glass" id="btn-send" style="padding: 8px 12px; border-radius: 50%;">➡️</button>
-            </div>
-        </div>
-    </main>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script type="module" src="image-processor.js"></script>
-    <script src="sidepanel.js"></script>
+  <div id="viewerWrap">
+    <iframe id="page-iframe"></iframe>
+    <div id="viewerBtns">
+      <button id="open-tab-btn" class="btn btnBlue">Tab</button>
+      <button id="reload-page-btn" class="btn">🔄</button>
+      <button id="close-page-btn" class="btn btnRed">✖</button>
+    </div>
+  </div>
+  <div id="visorWrap">
+    <canvas id="visor-canvas"></canvas>
+    <div id="visorHint">Visor: off</div>
+    <div id="visorBtns">
+      <button id="btn-rec" class="btn btnRed">🔴</button>
+      <button id="btn-rec-stop" class="btn" style="display:none;">⏹️</button>
+    </div>
+    <div id="rec-timer">00:00</div>
+  </div>
+  <div id="topbar">
+    <div style="font-weight:bold;font-size:14px;">AI Vision Ultra</div>
+    <select id="search-engine" class="select">
+      <option value="ddg">DuckDuckGo</option>
+      <option value="grok">Grok</option>
+      <option value="both">Both</option>
+    </select>
+    <select id="mode" class="select">
+      <option value="search">SEARCH</option>
+      <option value="auto">AGENT</option>
+    </select>
+    <select id="vision-model" class="select"><option value="">Vision…</option></select>
+    <select id="text-model" class="select"><option value="">Text…</option></select>
+    <button id="refresh-models" class="btn">🔄</button>
+  </div>
+  <div id="main"><div id="chat-log"></div></div>
+  <div id="bottom">
+    <div id="preview">
+      <img id="preview-img" />
+      <button id="preview-clear" class="btn btnRed">✖</button>
+    </div>
+    <div id="inputShell">
+      <textarea id="prompt" placeholder="Enter query…"></textarea>
+      <button id="btn-upload" class="btn">📎</button>
+      <button id="btn-shot" class="btn">📸</button>
+      <button id="btn-visor" class="btn">👁️</button>
+      <button id="btn-send" class="btn btnGreen">▶</button>
+      <button id="btn-cancel" class="btn btnRed" style="display:none;">■</button>
+    </div>
+  </div>
+  <input type="file" id="file-input" style="display:none" accept="image/*" />
+  <div id="loading"><div class="spinner"></div></div>
+  <script src="sidepanel.js"></script>
 </body>
 </html>

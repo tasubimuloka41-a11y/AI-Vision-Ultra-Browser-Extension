@@ -16,7 +16,7 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
-const EXTENSION_FILES = ['manifest.json', 'background.js', 'content.js', 'm365-content.js', 'sidepanel.html', 'sidepanel.css', 'sidepanel.js', 'rules.json', 'drive-api.js', 'image-processor.js', 'file-converter.js', 'chat-memory.js', 'm365-copilot.js'];
+const EXTENSION_FILES = ['manifest.json', 'background.js', 'content.js', 'sidepanel.html', 'sidepanel.js', 'rules.json', 'drive-api.js'];
 
 const server = http.createServer((req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
